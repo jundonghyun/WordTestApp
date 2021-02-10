@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Crowling Test</string>
+
+    <string-array name="ChooseFunction">
+
+        <item>"저장된 단어 보기"</item>
+        <item>"단어장파일 삭제"</item>
+        <item>"단어 추가"</item>
+
+    </string-array>
+</resources>

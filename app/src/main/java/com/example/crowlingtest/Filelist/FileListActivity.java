@@ -41,7 +41,6 @@ public class FileListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View v, int pos) {
                 setResult(1);
-                finish();
             }
         });
     }

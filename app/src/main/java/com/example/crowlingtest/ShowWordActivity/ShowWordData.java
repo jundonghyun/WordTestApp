@@ -27,4 +27,5 @@ public class ShowWordData {
     public void setMeaning(String meaning) {
         this.meaning = meaning;
     }
+
 }

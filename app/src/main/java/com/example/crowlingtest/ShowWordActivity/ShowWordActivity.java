@@ -24,6 +24,9 @@ import java.util.Set;
 public class ShowWordActivity extends AppCompatActivity {
 
     private ShowWordAdapter adapter;
+    public static ArrayList<HashMap<String, String>> Word_Mean = new ArrayList<>();
+    public static String ShowWordFileName;
+    public static File ShowWordAdapterFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +51,15 @@ public class ShowWordActivity extends AppCompatActivity {
     private void addItem(){
         String line = null;
         String word, mean;
-        ArrayList<HashMap<String, String>> Word_Mean = new ArrayList<>();
+
         ArrayList<ShowWordData> list = new ArrayList<>();
         Intent intent = getIntent();
-        String Filename = intent.getExtras().getString("FileList_FileName");
+        ShowWordFileName = intent.getExtras().getString("FileList_FileName");
         File dir = new File(getExternalFilesDir(null) + "/" + "pic.jpg");
+        ShowWordAdapterFile = new File(getExternalFilesDir(null) + "/" + "pic.jpg" ,ShowWordFileName);
 
         try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(dir+"/"+Filename));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(dir+"/"+ShowWordFileName));
             while((line = bufferedReader.readLine()) != null){
                 int idx = line.indexOf(" ");
                 word = line.substring(0, idx);

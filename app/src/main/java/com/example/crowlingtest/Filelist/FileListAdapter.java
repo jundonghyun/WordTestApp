@@ -108,7 +108,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ItemVi
                                     else if(items[which].equals("단어장파일 삭제")){
                                         /* 실제 파일삭제 */
                                         File file = new File(FileListActivity.deletefile, textView.getText().toString());
-                                        file.delete();
+                                        file.delete(); //실제 데이터 삭제
 
                                         Toast.makeText(context, "단어장 삭제됨", Toast.LENGTH_SHORT).show();
                                         mdata.remove(pos); //리스트에서만 삭제됨 실제 데이터는 삭제되지 않음
@@ -120,6 +120,13 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ItemVi
                                     else if(items[which].equals("단어 추가")){
                                         MainActivity.SelectedFileName = textView.getText().toString();
                                         v.getContext().startActivity(new Intent(FileListAdapter.context, MainActivity.class));
+                                    }
+                                    else if(items[which].equals("단어 삭제 및 수정")){
+                                        String Filename = textView.getText().toString();
+
+                                        Intent intent = new Intent(context, ShowWordActivity.class);
+                                        intent.putExtra("FileList_FileName", Filename);
+                                        context.startActivity(intent);
                                     }
 
                                 }

@@ -190,68 +190,57 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == REQ_CODE && resultCode == RESULT_OK) {
+
             Uri selectedfile = data.getData();
-            Toast.makeText(getApplicationContext(), getFileNameFromUri(selectedfile), Toast.LENGTH_LONG).show();
+            MainActivity.FileName = getFileNameFromUri(selectedfile);
 
-        }
+            String line = null;
 
-        if(resultCode != 1){
-            Log.d("debug", "error");
-        }
+            HashMap<String, String> overlap = new HashMap<>();
 
-        switch (resultCode){
-            case 1:
-                Log.d("debug", "onresult");
+            File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", FileName);
+            /* 저장하려는 중복되는 단어인지 확인하는 곳 */
+            try{
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                String overlap_word, overlap_mean;
 
-                String temp = SelectedFileName;
-                String line = null;
-
-                HashMap<String, String> overlap = new HashMap<>();
-
-                File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", temp);
-                /* 저장하려는 중복되는 단어인지 확인하는 곳 */
-                try{
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                    String overlap_word, overlap_mean;
-
-                    while((line = bufferedReader.readLine()) != null){
-                        int idx = line.indexOf(" ");
-                        overlap_word = line.substring(0, idx);
-                        overlap_mean = line.substring(idx+1, line.length());
-                        overlap.put(overlap_word, overlap_mean);
-                    }
-
-                    if(overlap.containsKey(Search)){
-                        Toast.makeText(this, "단어장에 이미 저장된 단어입니다", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        /* 중복되는 단어가 없다면 저장 하는 곳 */
-                        try{
-                            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-
-                            String word = Search; //해시맵에서 단어를 키로 찾아 단어와 뜻을 파일에 쓰기
-                            String mean = StoreWord.get(Search);
-                            String WriteFile = word +" "+mean;
-
-                            bufferedWriter.newLine();
-                            bufferedWriter.write(WriteFile);
-                            bufferedWriter.flush();
-                            bufferedWriter.close();
-
-                            Toast.makeText(this, "저장되었습니다", Toast.LENGTH_SHORT).show();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                while((line = bufferedReader.readLine()) != null){
+                    int idx = line.indexOf(" ");
+                    overlap_word = line.substring(0, idx);
+                    overlap_mean = line.substring(idx+1, line.length());
+                    overlap.put(overlap_word, overlap_mean);
                 }
-                break;
+
+                if(overlap.containsKey(Search)){
+                    Toast.makeText(this, "단어장에 이미 저장된 단어입니다", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    /* 중복되는 단어가 없다면 저장 하는 곳 */
+                    try{
+                        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+
+                        String word = Search; //해시맵에서 단어를 키로 찾아 단어와 뜻을 파일에 쓰기
+                        String mean = StoreWord.get(Search);
+                        String WriteFile = word +" "+mean;
+
+                        bufferedWriter.newLine();
+                        bufferedWriter.write(WriteFile);
+                        bufferedWriter.flush();
+                        bufferedWriter.close();
+
+                        Toast.makeText(this, "저장되었습니다", Toast.LENGTH_SHORT).show();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -279,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
                                     if(filename.getText().toString().matches("")){
                                         Toast.makeText(MainActivity.this, "파일이름을 입력하세요", Toast.LENGTH_SHORT).show();
                                         return;
+
                                     }
                                     else{
                                         FileName = filename.getText().toString();
@@ -329,8 +319,59 @@ public class MainActivity extends AppCompatActivity {
 //            Intent intent = new Intent(MainActivity.this, FileListActivity.class);
 //            startActivityForResult(intent, 0);
 
-            Intent intent = new Intent().setType("*/*") .setAction(Intent.ACTION_OPEN_DOCUMENT); intent.addCategory(Intent.CATEGORY_OPENABLE); startActivityForResult(Intent.createChooser(intent, "Select a file"), REQ_CODE);
+            if(MainActivity.FileName != null){ //파일을 선택한 적이 있다면
+                String line = null;
+                HashMap<String, String> overlap = new HashMap<>();
 
+                File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", FileName);
+                /* 저장하려는 중복되는 단어인지 확인하는 곳 */
+                try{
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    String overlap_word, overlap_mean;
+
+                    while((line = bufferedReader.readLine()) != null){
+                        int idx = line.indexOf(" ");
+                        overlap_word = line.substring(0, idx);
+                        overlap_mean = line.substring(idx+1, line.length());
+                        overlap.put(overlap_word, overlap_mean);
+                    }
+
+                    if(overlap.containsKey(Search)){
+                        Toast.makeText(this, "단어장에 이미 저장된 단어입니다", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        /* 중복되는 단어가 없다면 저장 하는 곳 */
+                        try{
+                            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+
+                            String word = Search; //해시맵에서 단어를 키로 찾아 단어와 뜻을 파일에 쓰기
+                            String mean = StoreWord.get(Search);
+                            String WriteFile = word +" "+mean;
+
+                            bufferedWriter.newLine();
+                            bufferedWriter.write(WriteFile);
+                            bufferedWriter.flush();
+                            bufferedWriter.close();
+
+                            Toast.makeText(this, "저장되었습니다", Toast.LENGTH_SHORT).show();
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                Intent intent = new Intent().setType("*/*") .setAction(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(Intent.createChooser(intent, "Select a file"), REQ_CODE);
+            }
         }
     }
 

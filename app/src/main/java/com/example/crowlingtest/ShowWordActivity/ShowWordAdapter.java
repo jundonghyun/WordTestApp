@@ -102,27 +102,46 @@ public class ShowWordAdapter extends RecyclerView.Adapter<ShowWordAdapter.ItemVi
 
                                                 try {
                                                     BufferedReader bufferedReader = new BufferedReader(new FileReader(ShowWordActivity.ShowWordAdapterFile));
+                                                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(ShowWordActivity.ShowWordAdapterFile, true));
+                                                    File f = ShowWordActivity.ShowWordAdapterFile;
 
-                                                    String remove_word, remove_mean;
+                                                    String replace_word, replace_mean;
 
                                                     while ((line = bufferedReader.readLine()) != null) {
                                                         int idx = line.indexOf(" ");
-                                                        remove_word = line.substring(0, idx);
-                                                        remove_mean = line.substring(idx + 1, line.length());
-                                                        modifyword.put(remove_word, remove_mean);
+                                                        if(idx == -1){
+                                                            continue;
+                                                        }
+                                                        replace_word = line.substring(0, idx);
+                                                        replace_mean = line.substring(idx + 1, line.length());
+                                                        modifyword.put(replace_word, replace_mean);
                                                     }
+                                                    modifyword.put(word.getText().toString(), mean.getText().toString());
 
-                                                    modifyword.remove(word.getText());
+                                                    Iterator<String> keys = modifyword.keySet().iterator();
+                                                    String WriteFile = "";
+                                                    while(keys.hasNext()){
+                                                        String key = keys.next();
+                                                        WriteFile += key +" "+modifyword.get(key) + "\n";
+                                                    }
+                                                    FileWriter fw = new FileWriter(f);
+                                                    fw.write(WriteFile);
+                                                    bufferedWriter.newLine();
+
+                                                    fw.close();
+                                                    bufferedReader.close();
+
                                                 } catch (FileNotFoundException e) {
                                                     e.printStackTrace();
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
                                                 }
+                                                notifyItemRemoved(pos);
                                             }
                                         }
                                     });
-                                    dial.create();
-                                    dial.show();
+                                    AlertDialog alertDialog = dial.create();
+                                    alertDialog.show();
 
                                 } else if (items[which].equals("단어 삭제")) {
                                     String line = null;
@@ -139,6 +158,9 @@ public class ShowWordAdapter extends RecyclerView.Adapter<ShowWordAdapter.ItemVi
 
                                         while ((line = bufferedReader.readLine()) != null) {
                                             int idx = line.indexOf(" ");
+                                            if(idx == -1){
+                                                continue;
+                                            }
                                             remove_word = line.substring(0, idx);
                                             remove_mean = line.substring(idx + 1, line.length());
                                             removeword.put(remove_word, remove_mean);
@@ -150,9 +172,10 @@ public class ShowWordAdapter extends RecyclerView.Adapter<ShowWordAdapter.ItemVi
                                         String WriteFile = "";
                                         while(keys.hasNext()){
                                             String key = keys.next();
-                                            WriteFile += key +" "+removeword.get(key) +"\n";
+                                            WriteFile += key +" "+removeword.get(key) + "\n";
                                         }
                                         FileWriter fw = new FileWriter(f);
+                                        bufferedWriter.newLine();
                                         fw.write(WriteFile);
 
                                         fw.close();

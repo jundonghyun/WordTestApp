@@ -206,6 +206,9 @@ public class MainActivity extends AppCompatActivity {
 
                 while((line = bufferedReader.readLine()) != null){
                     int idx = line.indexOf(" ");
+                    if(idx == -1){
+                        continue;
+                    }
                     overlap_word = line.substring(0, idx);
                     overlap_mean = line.substring(idx+1, line.length());
                     overlap.put(overlap_word, overlap_mean);

@@ -62,6 +62,9 @@ public class ShowWordActivity extends AppCompatActivity {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(dir+"/"+ShowWordFileName));
             while((line = bufferedReader.readLine()) != null){
                 int idx = line.indexOf(" ");
+                if(idx == -1){
+                    continue;
+                }
                 word = line.substring(0, idx);
                 mean = line.substring(idx+1, line.length());
                 list.add(new ShowWordData(word, mean));

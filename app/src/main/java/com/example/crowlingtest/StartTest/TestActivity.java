@@ -2,12 +2,17 @@ package com.example.crowlingtest.StartTest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.crowlingtest.HomeActivity;
+import com.example.crowlingtest.MainActivity;
 import com.example.crowlingtest.R;
 
 import java.io.BufferedReader;
@@ -61,6 +66,9 @@ public class TestActivity extends AppCompatActivity {
 
             while((line = bufferedReader.readLine()) != null){
                 int idx = line.indexOf(" ");
+                if(idx == -1){
+                    continue;
+                }
                 word = line.substring(0, idx);
                 mean = line.substring(idx+1, line.length());
                 storeword.put(word, mean);
@@ -75,6 +83,29 @@ public class TestActivity extends AppCompatActivity {
 
         shufflenum = RandomMean.size();
 
+        if(storeword.size() < 6){
+            AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+            int i = 6 - storeword.size();
+            builder.setTitle("단어가"+ i + "개 부족합니다");
+            builder.setItems(R.array.TestFunction, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String[] items = TestActivity.this.getResources().getStringArray(R.array.TestFunction);
+
+                    if(items[which].equals("단어 추가")){
+                        startActivity(new Intent(TestActivity.this, MainActivity.class));
+                    }
+                    else{
+                        finish();
+                        startActivity(new Intent(TestActivity.this, HomeActivity.class));
+                        ;
+                    }
+                }
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+
         continuetest();
 
         testbutton[0].setOnClickListener(new View.OnClickListener() {
@@ -84,7 +115,13 @@ public class TestActivity extends AppCompatActivity {
                 if(temp.equals(meanTemp)){
                     Toast.makeText(TestActivity.this, "정답입니다", Toast.LENGTH_SHORT).show();
                     storeword.remove(wordTemp);
-                    continuetest();
+                    if(storeword.isEmpty()){
+                        Toast.makeText(TestActivity.this, "테스트를 완료했습니다", Toast.LENGTH_SHORT).show();
+
+                    }
+                    else{
+                        continuetest();
+                    }
                 }
                 else{
                     Toast.makeText(TestActivity.this, "틀렸습니다", Toast.LENGTH_SHORT).show();
@@ -99,8 +136,13 @@ public class TestActivity extends AppCompatActivity {
                 if(temp.equals(meanTemp)){
                     Toast.makeText(TestActivity.this, "정답입니다", Toast.LENGTH_SHORT).show();
                     storeword.remove(wordTemp);
-                    continuetest();
+                    if(storeword.isEmpty()){
+                        Toast.makeText(TestActivity.this, "테스트를 완료했습니다", Toast.LENGTH_SHORT).show();
 
+                    }
+                    else{
+                        continuetest();
+                    }
                 }
                 else{
                     Toast.makeText(TestActivity.this, "틀렸습니다", Toast.LENGTH_SHORT).show();
@@ -116,7 +158,12 @@ public class TestActivity extends AppCompatActivity {
                 if(temp.equals(meanTemp)){
                     Toast.makeText(TestActivity.this, "정답입니다", Toast.LENGTH_SHORT).show();
                     storeword.remove(wordTemp);
-                    continuetest();
+                    if(storeword.isEmpty()){
+                        Toast.makeText(TestActivity.this, "테스트를 완료했습니다", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        continuetest();
+                    }
                 }
                 else{
                     Toast.makeText(TestActivity.this, "틀렸습니다", Toast.LENGTH_SHORT).show();

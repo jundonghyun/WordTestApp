@@ -16,4 +16,12 @@
         <item>"단어 삭제"</item>
 
     </string-array>
+
+    <string-array name="TestFunction">
+
+        <item>"단어 추가"</item>
+        <item>"취소"</item>
+
+    </string-array>
+
 </resources>

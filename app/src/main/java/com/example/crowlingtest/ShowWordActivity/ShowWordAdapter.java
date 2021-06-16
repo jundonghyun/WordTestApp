@@ -42,7 +42,7 @@ public class ShowWordAdapter extends RecyclerView.Adapter<ShowWordAdapter.ItemVi
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.show_word_list_item, parent, false);
-        this.context = parent.getContext();
+        context = parent.getContext();
 
         return new ItemViewHolder(view);
     }
@@ -57,7 +57,7 @@ public class ShowWordAdapter extends RecyclerView.Adapter<ShowWordAdapter.ItemVi
         return mdata.size();
     }
 
-    void addItem(ShowWordData data){
+    public void addItem(ShowWordData data){
        mdata.add(data);
     }
 

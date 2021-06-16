@@ -9,5 +9,14 @@ public class FileListData {
         Filename = filename;
     }
 
-    String Filename;
+    private String Filename;
+    private String FileAttribute;
+
+    public String getFileAttribute() {
+        return FileAttribute;
+    }
+
+    public void setFileAttribute(String fileAttribute) {
+        FileAttribute = fileAttribute;
+    }
 }

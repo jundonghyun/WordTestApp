@@ -6,17 +6,18 @@
     android:padding="8dp"
     android:gravity="center_vertical"
     android:layout_marginBottom="8dp"
-    android:background="@android:color/white">
+    android:background="#DADADA">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:background="@drawable/updown"
         android:orientation="horizontal">
 
         <LinearLayout
-            android:background="@drawable/updown"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingLeft="15dp"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center_vertical">
@@ -32,6 +33,23 @@
                 android:textColor="@android:color/black"
                 android:textStyle="bold"/>
         </LinearLayout>
-    </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_weight="2">
+
+            <TextView
+                android:id="@+id/FileAttr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:includeFontPadding="false"
+                android:textColor="@android:color/black"
+                android:hint="생성일자"/>
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

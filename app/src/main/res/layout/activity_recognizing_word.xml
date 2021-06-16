@@ -5,20 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".HomeActivity">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <Button
-            android:layout_margin="20dp"
-            android:id="@+id/addword"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/textId"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="단어 추가하기"
-            android:textSize="30dp"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 
@@ -27,29 +24,20 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <Button
-            android:layout_margin="20dp"
-            android:id="@+id/showfilelist"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="단어장 목록보기"
-            android:textSize="30dp"/>
-
+            android:id="@+id/imageId"/>
     </LinearLayout>
 
-    <LinearLayout
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="사진 찍기"
+        android:onClick="doProcess"/>
 
-        <Button
-            android:layout_margin="20dp"
-            android:id="@+id/start_word_test"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="단어 외우기"
-            android:textSize="30dp"/>
 
-    </LinearLayout>
 
 </LinearLayout>

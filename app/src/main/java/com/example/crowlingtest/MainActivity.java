@@ -7,14 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -26,11 +23,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.crowlingtest.Filelist.FileListActivity;
-import com.example.crowlingtest.Filelist.FileListAdapter;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,23 +38,19 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 public class MainActivity extends AppCompatActivity {
 
     public static String FileName = null;
     public static String SelectedFileName;
+    public  static EditText editText; //검색할 단어를 입력
     private static final int REQ_CODE = 123;
     private View customdialog;
-    private EditText editText; //검색할 단어를 입력
-    private Button button; //단어 검색을 위한 버튼
+    private Button button, OCRbutton; //단어 검색을 위한 버튼
     private Button WordSeletButton[] = new Button[4]; //검색된 단어의 뜻을 보여주고 단어와 뜻을 저장하기 위한 버튼
-
     private String Search; //검색할 단어를 크롤링하기 위한 변수
     private ArrayList<String> Word = new ArrayList<>(); //단어의 뜻을 저장할 배열리스트
     private HashMap<String, String> StoreWord = new HashMap<>(); //단어와 뜻을 저장할 해시맵
@@ -76,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.inputDic);
         button = findViewById(R.id.SearchButton);
+        OCRbutton = findViewById(R.id.RecognizeWord);
 
         WordSeletButton[0] = findViewById(R.id.WordSelectButton1);
         WordSeletButton[1] = findViewById(R.id.WordSelectButton2);
@@ -86,12 +76,36 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermission();
 
+        OCRbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, RecognizingWordActivity.class));
+            }
+        });
+
+        Intent intent = getIntent();
+        if(intent.getExtras() != null){
+            Search = intent.getExtras().getString("Select_word");
+            Search = Search.toLowerCase();
+            Search = Search.replaceAll(" ", "");
+            editText.setText(Search);
+        }
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Search = String.valueOf(editText.getText());
+                if(Search.equals("")){
+                    Toast.makeText(MainActivity.this, "단어를 입력하세요", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                manager.showSoftInput(editText, 0);
+                manager.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                //manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
                 Word.clear();
                 for (int i = 0; i < 4; i++) {
@@ -114,11 +128,22 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             doc = Jsoup.connect("https://dictionary.cambridge.org/ko/%EC%82%AC%EC%A0%84/%EC%98%81%EC%96%B4-%ED%95%9C%EA%B5%AD%EC%96%B4/" + Search).get();
 
-                            Elements contents = doc.select("div.pr.entry-body__el div.pos-body div.sense-block.pr.dsense.dsense-noh div.sense-body.dsense_b div.def-block.ddef_block span.trans.dtrans.dtrans-se");//회차 id값 가져오기
+                            Elements contents = doc.select("div.pr.entry-body__el div.pos-body div.sense-block.pr.dsense.dsense-noh div.sense-body.dsense_b div.def-block.ddef_block span.trans.dtrans.dtrans-se");
 
                             for (Element e : contents) {
                                 e.text();
                                 Word.add(e.text());
+                            }
+
+                            if(Word.size() == 0){
+                                MainActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "검색된 결과가 없습니다", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                editText.setText("");
+                                return;
                             }
 
                             bundle.putStringArrayList("Word", Word);
@@ -162,15 +187,17 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(View v) {
                                 StoreWord.put(Search, WordSeletButton[j].getText().toString()); //단어를 해시맵에 단어, 뜻 형태로 저장
 
-                                FindFile();
+                                getFileList();
                                 editText.setText("");
+                                for(int i = 0; i < WordSeletButton.length; i++){
+                                    WordSeletButton[i].setVisibility(View.INVISIBLE);
+                                }
                             }
                         });
                     }
                 }
             };
         });
-
     }
 
     private String getFileNameFromUri(Uri uri) {
@@ -184,7 +211,6 @@ public class MainActivity extends AppCompatActivity {
         return fileName;
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -197,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
             String line = null;
 
             HashMap<String, String> overlap = new HashMap<>();
-
             File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", FileName);
             /* 저장하려는 중복되는 단어인지 확인하는 곳 */
             try{
@@ -247,8 +272,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void FindFile(){
+    private void getFileList(){
         /* 파일 목록 불러오기 */
+
+
         File dir = new File(getExternalFilesDir(null) + "/" + "pic.jpg");
         File[] files = dir.listFiles();
         if(files.length == 0){
@@ -288,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
                                             fos.write(WriteFile.getBytes());
                                             fos.flush();
                                             fos.close();
+                                            Toast.makeText(MainActivity.this, "저장되었습니다", Toast.LENGTH_SHORT).show();
 
                                         } catch (FileNotFoundException e) {
                                             e.printStackTrace();
@@ -317,39 +345,37 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         }
         else{
-            /* 파일이 한개이상 존재한다면 파일을 선택하기위해서 파일목록을 보여줌 */
-
-//            Intent intent = new Intent(MainActivity.this, FileListActivity.class);
-//            startActivityForResult(intent, 0);
-
-            if(MainActivity.FileName != null){ //파일을 선택한 적이 있다면
+            if(MainActivity.SelectedFileName != null) { //파일을 선택한 적이 있다면
                 String line = null;
                 HashMap<String, String> overlap = new HashMap<>();
 
-                File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", FileName);
+                File file = new File(getExternalFilesDir(null) + "/" + "pic.jpg", SelectedFileName);
                 /* 저장하려는 중복되는 단어인지 확인하는 곳 */
-                try{
+                try {
                     BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                     String overlap_word, overlap_mean;
+                    //bufferedReader.readLine();
 
-                    while((line = bufferedReader.readLine()) != null){
+                    while ((line = bufferedReader.readLine()) != null) {
+                        if (line.equals("")) {
+                            continue;
+                        }
                         int idx = line.indexOf(" ");
                         overlap_word = line.substring(0, idx);
-                        overlap_mean = line.substring(idx+1, line.length());
+                        overlap_mean = line.substring(idx + 1, line.length());
                         overlap.put(overlap_word, overlap_mean);
                     }
 
-                    if(overlap.containsKey(Search)){
+                    if (overlap.containsKey(Search)) {
                         Toast.makeText(this, "단어장에 이미 저장된 단어입니다", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
+                    } else {
                         /* 중복되는 단어가 없다면 저장 하는 곳 */
-                        try{
+                        try {
                             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true));
 
                             String word = Search; //해시맵에서 단어를 키로 찾아 단어와 뜻을 파일에 쓰기
                             String mean = StoreWord.get(Search);
-                            String WriteFile = word +" "+mean;
+                            String WriteFile = word + " " + mean;
 
                             bufferedWriter.newLine();
                             bufferedWriter.write(WriteFile);
@@ -370,32 +396,14 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-            else{
-                Intent intent = new Intent().setType("*/*") .setAction(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(Intent.createChooser(intent, "Select a file"), REQ_CODE);
-            }
         }
     }
 
-    private List<String> FileList(String FolderName){
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + FolderName;
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-
-        List<String> filesNameList = new ArrayList<>();
-
-        if(files == null){
-            filesNameList.add("null");
-            return filesNameList;
-        }
-
-        for (int i=0; i< files.length; i++) {
-            filesNameList.add(files[i].getName());
-        }
-
-        return  filesNameList;
+        startActivity(new Intent(this, HomeActivity.class));
     }
 
     private void requestPermission() {

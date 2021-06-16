@@ -81,8 +81,5 @@ public class ShowWordActivity extends AppCompatActivity {
             Word_Mean.add(map);
             adapter.addItem(d);
         }
-
-
-
     }
 }

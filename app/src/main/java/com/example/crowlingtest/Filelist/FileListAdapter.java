@@ -72,12 +72,14 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ItemVi
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{
         TextView textView;
+        TextView fileattr;
         private FileListData data;
 
         public ItemViewHolder(View view) {
             super(view);
 
             textView = view.findViewById(R.id.FileName);
+            fileattr = view.findViewById(R.id.FileAttr);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -113,7 +115,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ItemVi
                                         Toast.makeText(context, "단어장 삭제됨", Toast.LENGTH_SHORT).show();
                                         mdata.remove(pos); //리스트에서만 삭제됨 실제 데이터는 삭제되지 않음
                                         notifyItemRemoved(pos); //삭제후 리사이클뷰 다시 초기화
-
+                                        notifyDataSetChanged();
 
 
                                     }
@@ -147,6 +149,7 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ItemVi
         void onBind(FileListData data){
             this.data = data;
             textView.setText(data.getFilename());
+            fileattr.setText(data.getFileAttribute());
         }
     }
 }

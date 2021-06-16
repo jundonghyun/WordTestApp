@@ -26,6 +26,12 @@
             android:layout_height="wrap_content"
             android:text="검색하기"/>
 
+        <Button
+            android:id="@+id/RecognizeWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="글자인식"/>
+
     </LinearLayout>
 
 
